@@ -7,12 +7,11 @@ namespace Drupal\DrupalExtension\Hook\Scope;
 
 use Behat\Behat\Context\Context;
 use Behat\Testwork\Environment\Environment;
-use Behat\Testwork\Hook\Scope\HookScope;
 
 /**
  * Represents an Entity hook scope.
  */
-abstract class BaseEntityScope implements EntityScope {
+abstract class BaseEntityScope implements EntityScopeInterface {
 
   /**
    * @var Environment

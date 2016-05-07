@@ -410,6 +410,21 @@ class DrupalContext extends RawDrupalContext implements TranslatableContext {
   }
 
   /**
+   * Creates entities of a given type provided in the form:
+   * | field_1       | field_2       | field_3       |
+   * | Field value 1 | Field value 2 | Field value 3 |
+   * | ...           | ...           | ...           |
+   *
+   * @Given :entity_type entities:
+   */
+  public function createEntities($entity_type, TableNode $entitiesTable) {
+    foreach ($entitiesTable->getHash() as $row) {
+      $entity = (object) $row;
+      $this->entityCreate($entity_type, $entity);
+    }
+  }
+
+  /**
    * Pauses the scenario until the user presses a key. Useful when debugging a scenario.
    *
    * @Then (I )break

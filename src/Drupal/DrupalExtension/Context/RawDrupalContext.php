@@ -90,6 +90,13 @@ class RawDrupalContext extends RawMinkContext implements DrupalAwareInterface {
   protected $languages = array();
 
   /**
+   * Keep track of entities so they can be cleaned up.
+   *
+   * @var array
+   */
+  protected $entities = array();
+
+  /**
    * {@inheritDoc}
    */
   public function setDrupal(DrupalDriverManager $drupal) {
@@ -273,6 +280,19 @@ class RawDrupalContext extends RawMinkContext implements DrupalAwareInterface {
   }
 
   /**
+   * Remove any created entities.
+   *
+   * @AfterScenario
+   */
+  public function cleanEntities() {
+    // Remove any entities that were created.
+    foreach ($this->entities as $entity) {
+      $this->getDriver()->entityDelete($entity);
+    }
+    $this->entities = array();
+  }
+
+  /**
    * Clear static caches.
    *
    * @AfterScenario @api
@@ -444,6 +464,22 @@ class RawDrupalContext extends RawMinkContext implements DrupalAwareInterface {
       $this->languages[$language->langcode] = $language;
     }
     return $language;
+  }
+
+  /**
+   * Create an entity.
+   *
+   * @return object
+   *   The created entity.
+   */
+  public function entityCreate($entity_type, $entity) {
+    $this->dispatchHooks('BeforeEntityCreateScope', $entity);
+    $this->parseEntityFields($entity_type, $entity);
+    $saved = $this->getDriver()->createEntity($entity_type, $entity);
+    // TODO: Figure out why $saved is NULL here.
+    //$this->dispatchHooks('AfterEntityCreateScope', $saved);
+    $this->entities[] = $saved;
+    return $saved;
   }
 
   /**
